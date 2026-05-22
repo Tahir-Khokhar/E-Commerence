@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}Shop - MyStore{% endblock %}
+
+{% block content %}
+<div class="row">
+
+    <!-- Sidebar Filters -->
+    <div class="col-lg-3">
+        <div class="card sticky-top" style="top: 20px;">
+            <div class="card-body">
+                <h5>Filters</h5>
+                
+                <!-- Search -->
+                <form method="GET" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" 
+                               placeholder="Search products..." value="{{ query }}">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Categories -->
+                <h6>Categories</h6>
+                <ul class="list-group mb-4">
+                    <li class="list-group-item">
+                        <a href="{% url 'store:product_list' %}" class="text-decoration-none">All Products</a>
+                    </li>
+                    {% for cat in categories %}
+                    <li class="list-group-item">
+                        <a href="{% url 'store:product_list_by_category' cat.slug %}" 
+                           class="text-decoration-none">
+                            {{ cat.name }}
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Price Filter -->
+                <h6>Price Range</h6>
+                <form method="GET">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <input type="number" name="min_price" class="form-control" 
+                                   placeholder="Min" value="{{ request.GET.min_price }}">
+                        </div>
+                        <div class="col-6">
+                            <input type="number" name="max_price" class="form-control" 
+                                   placeholder="Max" value="{{ request.GET.max_price }}">
+                        </div>
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100" type="submit">Apply</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="col-lg-9">
+        <h2>
+            {% if category %}Category: {{ category.name }}{% else %}All Products{% endif %}
+            {% if query %}- Search: "{{ query }}"{% endif %}
+        </h2>
+        
+        <div class="row">
+            {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 product-card">
+                    {% if product.image %}
+                        <img src="{{ product.image.url }}" class="card-img-top" 
+                             alt="{{ product.name }}" style="height: 200px; object-fit: contain;">
+                    {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 200px;">
+                            <span class="text-muted">No Image</span>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="card-body d-flex flex-column">
+                        <h6 class="card-title">{{ product.name }}</h6>
+<p class="text-success fw-bold">${{ product.price }}</p>
+                        
+                        <a href="{% url 'store:product_detail' product.slug %}" 
+                           class="btn btn-outline-primary mt-auto">View Details</a>
+                        
+                        <button onclick="addToCart({{ product.id }})" 
+                                class="btn btn-success mt-2">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+                <p class="text-center">No products found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function addToCart(productId) {
+    fetch(`/cart/add/${productId}/`, { method: 'GET' })
+    .then(() => {
+        alert('Product added to cart!');
+        location.reload();
+    });
+}
+</script>
+{% endblock %}

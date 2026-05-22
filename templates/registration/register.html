@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-8">
+    <h3 class="mb-3">Create Account</h3>
+
+    <form method="post" class="card card-body bg-light">
+      {% csrf_token %}
+
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">First name</label>
+          <input type="text" name="first_name" class="form-control" value="{{ form.first_name.value|default:'' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Last name</label>
+          <input type="text" name="last_name" class="form-control" value="{{ form.last_name.value|default:'' }}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" value="{{ form.username.value|default:'' }}">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" value="{{ form.email.value|default:'' }}">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Password</label>
+          <input type="password" name="password1" class="form-control">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Confirm Password</label>
+          <input type="password" name="password2" class="form-control">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-success mt-3 w-100">Register</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

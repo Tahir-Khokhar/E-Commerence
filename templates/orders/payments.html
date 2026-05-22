@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Payment{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow">
+            <div class="card-body text-center">
+                <h3>Complete Your Payment</h3>
+                <h4 class="text-success">${{ order.total_amount }}</h4>
+                <hr>
+                
+                <button id="offline-pay" class="btn btn-primary btn-lg px-5">
+                    Confirm Payment (Bank/JazzCash/EasyPaisa)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Offline payment submission (no Razorpay)
+    document.getElementById('offline-pay').addEventListener('click', function (e) {
+        e.preventDefault();
+
+        const form = document.getElementById('payment-form');
+        form.submit();
+    });
+</script>
+
+<form id="payment-form" method="POST" action="{% url 'orders:paymenthandler' %}" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="order_id" value="{{ order.id }}" />
+    <input type="hidden" name="status" value="paid" />
+</form>
+{% endblock %}

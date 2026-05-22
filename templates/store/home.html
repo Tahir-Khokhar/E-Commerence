@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Welcome to MyStore{% endblock %}
+
+{% block content %}
+<div class="jumbotron text-center py-5 bg-light rounded-3 mb-5">
+    <h1 class="display-4">Welcome to MyStore</h1>
+    <p class="lead">Best products at affordable prices</p>
+    <a href="{% url 'store:product_list' %}" class="btn btn-primary btn-lg">Shop Now</a>
+</div>
+
+<h3 class="mb-4">Featured Products</h3>
+<div class="row">
+    {% for product in products %}
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" class="card-img-top" style="height:180px; object-fit:contain;">
+            {% endif %}
+            <div class="card-body">
+                <h6>{{ product.name }}</h6>
+                <p class="text-success">${{ product.price }}</p>
+                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-sm btn-primary">View</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
