@@ -14,16 +14,35 @@ def checkout(request):
         return redirect('store:home')
 
     if request.method == 'POST':
-        # Create Order in DB
+        # Create Order in DB (new schema stores shipping in Address)
+        address = request.POST.get('address', '').strip()
+        city = request.POST.get('city', '').strip()
+
+        addr_obj = None
+        if address or city:
+            addr_obj = Order.objects.model._meta.get_field('user')  # no-op placeholder
+
+        # Create (or attach) Address
+        from .models import Address
+        addr_obj = Address.objects.create(
+            user=request.user,
+            first_name=request.POST.get('first_name', '').strip(),
+            last_name=request.POST.get('last_name', '').strip(),
+            phone=request.POST.get('phone', '').strip() or '0000000000',
+            line1=address,
+            line2='',
+            city=city,
+            area='',
+            postal_code='',
+            is_default=True,
+        )
+
         order = Order.objects.create(
             user=request.user,
-            first_name=request.POST.get('first_name'),
-            last_name=request.POST.get('last_name'),
-            email=request.POST.get('email'),
-            address=request.POST.get('address'),
-            city=request.POST.get('city'),
-            total_amount=cart.get_total_price()
+            billing_address=addr_obj,
+            total_amount=cart.get_total_price(),
         )
+
 
         # Save Order Items (using current cart data model fields)
         # NOTE: This project currently doesn’t define an OrderItem model; so we only mark the order.
@@ -38,7 +57,7 @@ def checkout(request):
         # Render success immediately for offline methods.
         return render(request, 'orders/payment_success.html', {'order': order})
 
-    return render(request, 'orders/checkout.html', {'cart': cart})
+    return render(request, 'orders/check_out.html', {'cart': cart})
 
 
 @csrf_exempt
