@@ -11,7 +11,10 @@
         <div class="card-body">
             <h5>Order #{{ order.id }}</h5>
             <p><strong>Amount Paid:</strong> ${{ order.total_amount }}</p>
-            <p><strong>Payment ID:</strong> {{ order.(Bank/Jazzcash/Easypaisa)_payment_id }}</p>
+            {# Current project stores only `paid` and `total_amount` on Order.
+               Payment provider IDs can be shown once added to the schema. #}
+            <p><strong>Payment Status:</strong> Paid</p>
+
         </div>
     </div>
     
