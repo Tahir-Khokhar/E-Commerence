@@ -13,81 +13,130 @@
     </a>
 </div>
 
-<!-- Featured Products Section -->
+<!-- View All + Search -->
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h3 class="mb-0 fw-bold" style="letter-spacing: -0.5px;">Featured Products</h3>
-    <a href="{% url 'store:product_list' %}" class="text-decoration-none fw-semibold text-primary">
-        View All <i class="fas fa-arrow-right ms-1"></i>
-    </a>
+    <h3 class="mb-0 fw-bold" style="letter-spacing: -0.5px;">Shop by Category</h3>
+
+    <div class="d-flex align-items-center gap-3" style="max-width: 520px; width: 100%;">
+        <input
+            id="homeSearch"
+            type="text"
+            class="form-control"
+            placeholder="Search products..."
+            autocomplete="off"
+        />
+        <a href="{% url 'store:product_list' %}" class="text-decoration-none fw-semibold text-primary">
+            View All <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+    </div>
 </div>
 
-<div class="row g-4">
-    {% for product in products %}
-    <div class="col-sm-6 col-md-4 col-lg-3">
-        <div class="product-card">
-            <div class="product-card-img-wrapper">
-                {% if product.discount_percent > 0 %}
-                    <span class="discount-badge">-{{ product.discount_percent }}%</span>
-                {% endif %}
-                
-                {% if product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                {% else %}
-                    <div class="d-flex flex-column align-items-center justify-content-center text-muted h-100">
-                        <i class="fas fa-image fa-3x mb-2 text-opacity-25" style="color: var(--color-dark-muted);"></i>
-                        <span style="font-size: 0.8rem;">No Image Available</span>
-                    </div>
-                {% endif %}
-            </div>
-            
-            <div class="card-body">
-                <h6 class="card-title mb-2">
-                    <a href="{% url 'store:product_detail' product.slug %}" class="text-dark text-decoration-none">
-                        {{ product.name }}
+{% if category_products %}
+    {% for cp in category_products %}
+        {# Remove Beauty & Skincare category from homepage #}
+        {% if cp.category.name != "Beauty & Skincare" %}
+            <div class="mb-5">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h3 class="mb-0 fw-bold" style="letter-spacing: -0.5px;">{{ cp.category.name }}</h3>
+                    <a href="{% url 'store:product_list_by_category' cp.category.slug %}" class="text-decoration-none fw-semibold text-primary">
+                        See all <i class="fas fa-arrow-right ms-1"></i>
                     </a>
-                </h6>
-                <p class="text-muted small mb-3">Category: {{ product.category.name }}</p>
-                
-                <div class="d-flex align-items-baseline mt-auto">
-                    {% if product.discount_percent > 0 %}
-                        <span class="price-strike">${{ product.base_price }}</span>
-                    {% endif %}
-                    <span class="price-tag mb-0">${{ product.price }}</span>
                 </div>
-                
-                <div class="row g-2 mt-2">
-                    <div class="col-6">
-                        <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-outline-secondary w-100 btn-sm py-2">
-                            Details
-                        </a>
+
+                <div class="row g-4">
+                    {% for product in cp.products %}
+                    <div class="col-sm-6 col-md-4 col-lg-3 home-product" data-product-search="{{ product.name }} {{ product.category.name }}">
+                        <div class="product-card">
+                            <div class="product-card-img-wrapper">
+                                {% if product.discount_percent > 0 %}
+                                    <span class="discount-badge">-{{ product.discount_percent }}%</span>
+                                {% endif %}
+
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                {% else %}
+                                    <div class="d-flex flex-column align-items-center justify-content-center text-muted h-100">
+                                        <i class="fas fa-image fa-3x mb-2 text-opacity-25" style="color: var(--color-dark-muted);"></i>
+                                        <span style="font-size: 0.8rem;">No Image Available</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="card-body">
+                                <h6 class="card-title mb-2">
+                                    <a href="{% url 'store:product_detail' product.slug %}" class="text-dark text-decoration-none">
+                                        {{ product.name }}
+                                    </a>
+                                </h6>
+                                <p class="text-muted small mb-3">Category: {{ product.category.name }}</p>
+
+                                <div class="d-flex align-items-baseline mt-auto">
+                                    {% if product.discount_percent > 0 %}
+                                        <span class="price-strike">${{ product.base_price }}</span>
+                                    {% endif %}
+                                    <span class="price-tag mb-0">${{ product.price }}</span>
+                                </div>
+
+                                <div class="row g-2 mt-2">
+                                    <div class="col-6">
+                                        <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-outline-secondary w-100 btn-sm py-2">
+                                            Details
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <button onclick="addToCart(event, {{ product.id }})" class="btn btn-primary w-100 btn-sm py-2">
+                                            <i class="fas fa-cart-plus"></i> Add
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <button onclick="addToCart(event, {{ product.id }})" class="btn btn-primary w-100 btn-sm py-2">
-                            <i class="fas fa-cart-plus"></i> Add
-                        </button>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
-        </div>
-    </div>
-    {% empty %}
+        {% endif %}
+    {% endfor %}
+{% else %}
     <div class="col-12 text-center py-5">
         <div class="text-muted">
             <i class="fas fa-box-open fa-3x mb-3 text-secondary"></i>
-            <p>No featured products available at the moment.</p>
+            <p>No products available at the moment.</p>
         </div>
     </div>
-    {% endfor %}
-</div>
+{% endif %}
+
 
 <script>
+(function () {
+    const input = document.getElementById('homeSearch');
+    if (!input) return;
+
+    function normalize(s) {
+        return (s || '').toLowerCase();
+    }
+
+    function applyFilter() {
+        const q = normalize(input.value).trim();
+        const cards = document.querySelectorAll('.home-product');
+
+        cards.forEach(card => {
+            const haystack = normalize(card.dataset.productSearch);
+            const match = !q || haystack.includes(q);
+            card.style.display = match ? '' : 'none';
+        });
+    }
+
+    input.addEventListener('input', applyFilter);
+    applyFilter();
+})();
+
 function addToCart(event, productId) {
     event.preventDefault();
     fetch(`/cart/add/${productId}/`, { method: 'GET' })
     .then(response => {
-        if(response.ok) {
+        if (response.ok) {
             showToast('Added product to shopping cart!');
-            // Update the cart quantity pill in navbar
             setTimeout(() => {
                 location.reload();
             }, 800);
@@ -101,3 +150,6 @@ function addToCart(event, productId) {
 }
 </script>
 {% endblock %}
+
+
+
